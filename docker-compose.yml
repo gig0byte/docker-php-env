@@ -1,0 +1,42 @@
+version:  "3"
+
+services: 
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes: 
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./src:/app
+      - ./tests:/app/tests
+  
+  php:
+    # image: php:fpm
+    build: 
+      context: .
+      dockerfile: PHP.Dockerfile
+    environment: 
+      MYSQL_HOST: "mysql"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "pass"
+      MYSQL_DATABASE: "db"
+      MYSQL_TCP_PORT: 3310
+    volumes:
+      - ./src:/app
+      - ./tests:/app/tests
+
+  mysql:
+    image: mysql:latest
+    environment: 
+      MYSQL_ROOT_PASSWORD: "secret"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "pass"
+      MYSQL_DATABASE: "db"
+      MYSQL_TCP_PORT: 3310
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports: 
+      - "3310:3306"
+
+volumes:
+  mysqldata: {}
